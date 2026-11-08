@@ -1,72 +1,28 @@
-# ====================================
-# Title: Evaluating the 2021 Chicago Speed Camera Policy
-# Author: Adriana Puerta
-# Date: 2022.07.22
-# Description: This script cleans Chicago speed camera violation data and runs a fixed effects regression to evaluate the impact of the March 2021 policy change.
-# =====================================
+# Evaluating the 2021 Chicago Speed Camera Policy
 
-library(tidyverse)
-library(lubridate)
-library(ggplot2)
-library(scales)
+## Research Question
+Did the March 2021 policy change reduce daily speed camera violations in Children's Safety Zones in Chicago?
 
-# 1. Load Data
-# Note: Data downloaded from [[https://data.cityofchicago.org/Transportation/speed-violation/4ueg-apyt]]
-speed_tickets <- read_csv("data/Speed_Camera_Violations.csv", show_col_types = FALSE)
+## Data Source
+Data was downloaded from the [Chicago Data Portal](https://data.cityofchicago.org/) on [Insert Date]. The dataset used is "Speed Camera Violations".
 
-# 2. Data Cleaning & Aggregation
-# Aggregate violations to monthly level for plotting
-monthly_violations <- speed_tickets %>%
-  select(`VIOLATION DATE`, VIOLATIONS) %>%
-  mutate(date = mdy(`VIOLATION DATE`)) %>%
-  filter(date >= as.Date("2018-01-01") & date <= as.Date("2021-12-31")) %>%
-  mutate(year = year(date), 
-         month = month(date, label = TRUE, abbr = TRUE)) %>%
-  group_by(year, month) %>%
-  summarize(total_violations = sum(VIOLATIONS), .groups = 'drop')
+## Methodology
+1.  **Data Cleaning:** Violations were aggregated to a monthly level. Only cameras that were active before 2018 were retained to establish a consistent baseline cohort.
+2.  **Exploratory Analysis:** A time-series line graph was generated to visualize monthly violation trends from 2018 to 2021.
+3.  **Causal Analysis:** A Two-Way Fixed Effects (FE) regression model was estimated to evaluate the policy's impact. The model includes camera-specific fixed effects (to control for time-invariant differences between cameras) and month-specific fixed effects (to control for seasonality).
 
-# 3. Data Visualization
-p1 <- ggplot(monthly_violations, aes(x = month, y = total_violations, 
-                                     group = factor(year), color = factor(year))) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
-  scale_y_continuous(labels = comma) +
-  scale_color_brewer(palette = "Set1") +
-  labs(
-    title = "Total Monthly Speed Camera Violations in Chicago (2018-2021)",
-    subtitle = "Policy change took effect in March 2021",
-    x = "Month", 
-    y = "Total Violations",
-    color = "Year"
-  ) +
-  theme_minimal()
+## Key Findings
+*   [Insert 1-2 sentences on what the regression showed. For example: "The coefficient for the 'post' policy variable was negative and statistically significant at the 5% level, suggesting the policy was associated with a reduction in monthly violations."]
 
-ggsave("output/monthly_violations_plot.png", plot = p1, width = 8, height = 5)
+## Repository Structure
+- `data/`: Contains the raw CSV file.
+- `scripts/01_analysis.R`: The R script for data cleaning, visualization, and regression.
+- `output/`: Contains the generated time-series plot (`.png`) and the regression summary (`.txt`).
 
-# 4. Fixed Effects Regression
-# Filter for cameras active before 2018 to establish a baseline
-baseline_cameras <- speed_tickets %>%
-  mutate(date = mdy(`VIOLATION DATE`)) %>%
-  filter(date < as.Date("2018-01-01")) %>%
-  distinct(`CAMERA ID`)
+## Limitations
+- The model does not cluster standard errors, which may understate uncertainty.
+- A formal parallel trends test (event study) was not performed; therefore, the results should be interpreted as associational rather than strictly causal.
 
-# Join back to get monthly violations for the baseline cameras
-model_data <- speed_tickets %>%
-  inner_join(baseline_cameras, by = "CAMERA ID") %>%
-  mutate(date = mdy(`VIOLATION DATE`)) %>%
-  filter(date >= as.Date("2018-01-01") & date <= as.Date("2021-12-31")) %>%
-  mutate(
-    post = ifelse(date >= as.Date("2021-03-01"), 1, 0),
-    month_num = month(date)
-  )
-
-# Run Two-Way Fixed Effects Model
-fe_model <- lm(VIOLATIONS ~ post + factor(`CAMERA ID`) + factor(month_num), 
-               data = model_data)
-
-# Save model results to a text file
-sink("output/fe_model_results.txt")
-print(summary(fe_model))
-sink()
-
-message("Analysis complete. Check the output/ folder for results.")
+## How to Run
+1. Open the `.Rproj` file in RStudio.
+2. Run `scripts/01_analysis.R`. The script will read the data from the `data/` folder and save outputs to the `output/` folder.
