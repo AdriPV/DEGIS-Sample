@@ -1,9 +1,9 @@
-# ==============================================================================
+# =====================================================
 # Title: Evaluating the 2021 Chicago Speed Camera Policy
 # Author: Adriana Puerta
 # Date: 2022.07.22
 # Description: This script cleans Chicago speed camera violation data and runs a fixed effects regression to evaluate the impact of the March 2021 policy change.
-# ==============================================================================
+# =====================================================
 
 library(tidyverse)
 library(lubridate)
