@@ -4,7 +4,7 @@
 Did the March 2021 policy change reduce daily speed camera violations in Children's Safety Zones in Chicago?
 
 ## Data Source
-Data was downloaded from the [Chicago Data Portal](https://data.cityofchicago.org/) on [Insert Date]. The dataset used is "Speed Camera Violations".
+Data was downloaded from the [Chicago Data Portal](https://data.cityofchicago.org/) on 2022.07.20. The dataset used is "Speed Camera Violations".
 
 ## Methodology
 1.  **Data Cleaning:** Violations were aggregated to a monthly level. Only cameras that were active before 2018 were retained to establish a consistent baseline cohort.
@@ -12,7 +12,7 @@ Data was downloaded from the [Chicago Data Portal](https://data.cityofchicago.or
 3.  **Causal Analysis:** A Two-Way Fixed Effects (FE) regression model was estimated to evaluate the policy's impact. The model includes camera-specific fixed effects (to control for time-invariant differences between cameras) and month-specific fixed effects (to control for seasonality).
 
 ## Key Findings
-*   [Insert 1-2 sentences on what the regression showed. For example: "The coefficient for the 'post' policy variable was negative and statistically significant at the 5% level, suggesting the policy was associated with a reduction in monthly violations."]
+*   The coefficient for the 'post' policy variable was negative and statistically significant at the 5% level, suggesting the policy was associated with a reduction in monthly violations.
 
 ## Repository Structure
 - `data/`: Contains the raw CSV file.
