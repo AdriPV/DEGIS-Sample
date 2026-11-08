@@ -2,9 +2,7 @@
 # Title: Evaluating the 2021 Chicago Speed Camera Policy
 # Author: Adriana Puerta
 # Date: 2022.07.22
-# Description: This script cleans Chicago speed camera violation data and 
-#              runs a fixed effects regression to evaluate the impact of the 
-#              March 2021 policy change.
+# Description: This script cleans Chicago speed camera violation data and runs a fixed effects regression to evaluate the impact of the March 2021 policy change.
 # ==============================================================================
 
 library(tidyverse)
@@ -12,11 +10,11 @@ library(lubridate)
 library(ggplot2)
 library(scales)
 
-# 1. Load Data ----------------------------------------------------------------
-# Note: Data downloaded from [Insert Chicago Data Portal Link]
+# 1. Load Data
+# Note: Data downloaded from [[https://data.cityofchicago.org/Transportation/speed-violation/4ueg-apyt]]
 speed_tickets <- read_csv("data/Speed_Camera_Violations.csv", show_col_types = FALSE)
 
-# 2. Data Cleaning & Aggregation ----------------------------------------------
+# 2. Data Cleaning & Aggregation
 # Aggregate violations to monthly level for plotting
 monthly_violations <- speed_tickets %>%
   select(`VIOLATION DATE`, VIOLATIONS) %>%
@@ -27,7 +25,7 @@ monthly_violations <- speed_tickets %>%
   group_by(year, month) %>%
   summarize(total_violations = sum(VIOLATIONS), .groups = 'drop')
 
-# 3. Data Visualization --------------------------------------------------------
+# 3. Data Visualization
 p1 <- ggplot(monthly_violations, aes(x = month, y = total_violations, 
                                      group = factor(year), color = factor(year))) +
   geom_line(linewidth = 1) +
@@ -45,7 +43,7 @@ p1 <- ggplot(monthly_violations, aes(x = month, y = total_violations,
 
 ggsave("output/monthly_violations_plot.png", plot = p1, width = 8, height = 5)
 
-# 4. Fixed Effects Regression --------------------------------------------------
+# 4. Fixed Effects Regression
 # Filter for cameras active before 2018 to establish a baseline
 baseline_cameras <- speed_tickets %>%
   mutate(date = mdy(`VIOLATION DATE`)) %>%
